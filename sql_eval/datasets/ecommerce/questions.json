@@ -1,0 +1,247 @@
+[
+  {
+    "question_id": "E001",
+    "question": "How many customers do we have?",
+    "sql": "SELECT COUNT(*) FROM customers",
+    "difficulty": "easy",
+    "category": "aggregation"
+  },
+  {
+    "question_id": "E002",
+    "question": "What is the total revenue from all orders?",
+    "sql": "SELECT SUM(total_amount) FROM orders",
+    "difficulty": "easy",
+    "category": "aggregation"
+  },
+  {
+    "question_id": "E003",
+    "question": "List all products in the Electronics category",
+    "sql": "SELECT * FROM products WHERE category = 'Electronics'",
+    "difficulty": "easy",
+    "category": "filter"
+  },
+  {
+    "question_id": "E004",
+    "question": "What is the average product price?",
+    "sql": "SELECT AVG(price) FROM products",
+    "difficulty": "easy",
+    "category": "aggregation"
+  },
+  {
+    "question_id": "E005",
+    "question": "List all customers from Maharashtra",
+    "sql": "SELECT * FROM customers WHERE state = 'Maharashtra'",
+    "difficulty": "easy",
+    "category": "filter"
+  },
+  {
+    "question_id": "E006",
+    "question": "How many orders have been delivered?",
+    "sql": "SELECT COUNT(*) FROM orders WHERE status = 'delivered'",
+    "difficulty": "easy",
+    "category": "filter"
+  },
+  {
+    "question_id": "E007",
+    "question": "What are the top 5 most expensive products?",
+    "sql": "SELECT * FROM products ORDER BY price DESC LIMIT 5",
+    "difficulty": "easy",
+    "category": "orderby"
+  },
+  {
+    "question_id": "E008",
+    "question": "List all unique product categories",
+    "sql": "SELECT DISTINCT category FROM products",
+    "difficulty": "easy",
+    "category": "simple_select"
+  },
+  {
+    "question_id": "E009",
+    "question": "How many products are in stock (quantity > 0)?",
+    "sql": "SELECT COUNT(*) FROM products WHERE stock_quantity > 0",
+    "difficulty": "easy",
+    "category": "filter"
+  },
+  {
+    "question_id": "E010",
+    "question": "What is the total discount given across all orders?",
+    "sql": "SELECT SUM(discount_amount) FROM orders",
+    "difficulty": "easy",
+    "category": "aggregation"
+  },
+  {
+    "question_id": "E011",
+    "question": "How many orders has each customer placed?",
+    "sql": "SELECT customer_id, COUNT(*) as order_count FROM orders GROUP BY customer_id",
+    "difficulty": "medium",
+    "category": "groupby"
+  },
+  {
+    "question_id": "E012",
+    "question": "What is the total revenue by product category?",
+    "sql": "SELECT p.category, SUM(oi.quantity * oi.unit_price) as revenue FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.category",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E013",
+    "question": "List customers who have placed more than 2 orders",
+    "sql": "SELECT c.* FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id HAVING COUNT(*) > 2",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E014",
+    "question": "What is the average order value by state?",
+    "sql": "SELECT shipping_state, AVG(total_amount) as avg_order_value FROM orders GROUP BY shipping_state",
+    "difficulty": "medium",
+    "category": "groupby"
+  },
+  {
+    "question_id": "E015",
+    "question": "Which products have never been ordered?",
+    "sql": "SELECT p.* FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.item_id IS NULL",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E016",
+    "question": "What is the total quantity sold for each product?",
+    "sql": "SELECT p.name, SUM(oi.quantity) as total_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id, p.name",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E017",
+    "question": "List the top 3 customers by total spending",
+    "sql": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spent DESC LIMIT 3",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E018",
+    "question": "What is the average rating for each product?",
+    "sql": "SELECT p.name, AVG(r.rating) as avg_rating FROM products p JOIN reviews r ON p.product_id = r.product_id GROUP BY p.product_id, p.name",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E019",
+    "question": "How many orders were placed each month in 2024?",
+    "sql": "SELECT strftime('%Y-%m', order_date) as month, COUNT(*) as order_count FROM orders WHERE order_date >= '2024-01-01' GROUP BY strftime('%Y-%m', order_date)",
+    "difficulty": "medium",
+    "category": "date_functions"
+  },
+  {
+    "question_id": "E020",
+    "question": "List products with price above average",
+    "sql": "SELECT * FROM products WHERE price > (SELECT AVG(price) FROM products)",
+    "difficulty": "medium",
+    "category": "subquery"
+  },
+  {
+    "question_id": "E021",
+    "question": "Which customers have not placed any orders?",
+    "sql": "SELECT c.* FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id WHERE o.order_id IS NULL",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E022",
+    "question": "What is the profit margin for each product?",
+    "sql": "SELECT name, price, cost, (price - cost) as profit, ((price - cost) / price * 100) as margin_percent FROM products",
+    "difficulty": "medium",
+    "category": "simple_select"
+  },
+  {
+    "question_id": "E023",
+    "question": "List orders with total amount greater than the average order amount",
+    "sql": "SELECT * FROM orders WHERE total_amount > (SELECT AVG(total_amount) FROM orders)",
+    "difficulty": "medium",
+    "category": "subquery"
+  },
+  {
+    "question_id": "E024",
+    "question": "What is the count of products in each subcategory of Electronics?",
+    "sql": "SELECT subcategory, COUNT(*) as product_count FROM products WHERE category = 'Electronics' GROUP BY subcategory",
+    "difficulty": "medium",
+    "category": "groupby"
+  },
+  {
+    "question_id": "E025",
+    "question": "Find the customer who has spent the most money",
+    "sql": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spent DESC LIMIT 1",
+    "difficulty": "medium",
+    "category": "joins"
+  },
+  {
+    "question_id": "E026",
+    "question": "What percentage of orders have been delivered?",
+    "sql": "SELECT (COUNT(CASE WHEN status = 'delivered' THEN 1 END) * 100.0 / COUNT(*)) as delivery_percentage FROM orders",
+    "difficulty": "hard",
+    "category": "aggregation"
+  },
+  {
+    "question_id": "E027",
+    "question": "Find products that have rating above 4 but have been ordered less than 3 times",
+    "sql": "SELECT p.* FROM products p JOIN reviews r ON p.product_id = r.product_id LEFT JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id HAVING AVG(r.rating) > 4 AND COUNT(DISTINCT oi.order_id) < 3",
+    "difficulty": "hard",
+    "category": "complex"
+  },
+  {
+    "question_id": "E028",
+    "question": "Calculate the month-over-month revenue growth",
+    "sql": "WITH monthly_revenue AS (SELECT strftime('%Y-%m', order_date) as month, SUM(total_amount) as revenue FROM orders GROUP BY strftime('%Y-%m', order_date)) SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) as prev_revenue, ((revenue - LAG(revenue) OVER (ORDER BY month)) / LAG(revenue) OVER (ORDER BY month) * 100) as growth_percent FROM monthly_revenue",
+    "difficulty": "hard",
+    "category": "window_functions"
+  },
+  {
+    "question_id": "E029",
+    "question": "Find customers who have bought products from at least 3 different categories",
+    "sql": "SELECT c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY c.customer_id, c.name HAVING COUNT(DISTINCT p.category) >= 3",
+    "difficulty": "hard",
+    "category": "complex"
+  },
+  {
+    "question_id": "E030",
+    "question": "Rank products by total revenue within each category",
+    "sql": "SELECT p.category, p.name, SUM(oi.quantity * oi.unit_price) as revenue, RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.unit_price) DESC) as rank FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.category, p.product_id, p.name",
+    "difficulty": "hard",
+    "category": "window_functions"
+  },
+  {
+    "question_id": "E031",
+    "question": "Find the second highest priced product in each category",
+    "sql": "WITH ranked AS (SELECT category, name, price, ROW_NUMBER() OVER (PARTITION BY category ORDER BY price DESC) as rn FROM products) SELECT category, name, price FROM ranked WHERE rn = 2",
+    "difficulty": "hard",
+    "category": "window_functions"
+  },
+  {
+    "question_id": "E032",
+    "question": "Calculate the running total of revenue by order date",
+    "sql": "SELECT order_date, total_amount, SUM(total_amount) OVER (ORDER BY order_date) as running_total FROM orders ORDER BY order_date",
+    "difficulty": "hard",
+    "category": "window_functions"
+  },
+  {
+    "question_id": "E033",
+    "question": "Find products where the total quantity sold exceeds the current stock",
+    "sql": "SELECT p.name, p.stock_quantity, SUM(oi.quantity) as total_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id, p.name, p.stock_quantity HAVING SUM(oi.quantity) > p.stock_quantity",
+    "difficulty": "hard",
+    "category": "complex"
+  },
+  {
+    "question_id": "E034",
+    "question": "List customers along with their most purchased product category",
+    "sql": "WITH customer_category AS (SELECT c.customer_id, c.name, p.category, COUNT(*) as purchase_count, ROW_NUMBER() OVER (PARTITION BY c.customer_id ORDER BY COUNT(*) DESC) as rn FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY c.customer_id, c.name, p.category) SELECT customer_id, name, category as top_category FROM customer_category WHERE rn = 1",
+    "difficulty": "hard",
+    "category": "complex"
+  },
+  {
+    "question_id": "E035",
+    "question": "Calculate the average time between orders for each customer",
+    "sql": "WITH order_gaps AS (SELECT customer_id, order_date, LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date) as prev_order_date FROM orders) SELECT customer_id, AVG(julianday(order_date) - julianday(prev_order_date)) as avg_days_between_orders FROM order_gaps WHERE prev_order_date IS NOT NULL GROUP BY customer_id",
+    "difficulty": "hard",
+    "category": "window_functions"
+  }
+]
