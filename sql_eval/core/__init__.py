@@ -2,25 +2,25 @@
 Core evaluation components
 """
 
+from .evaluator import Evaluator
 from .models import (
-    QueryStatus,
-    Difficulty,
     Category,
-    TableSchema,
     DatabaseSchema,
+    Difficulty,
     EvaluationCase,
-    EvaluationResult,
     EvaluationReport,
+    EvaluationResult,
+    FailurePattern,
     PartialScores,
-    FailurePattern
+    QueryStatus,
+    TableSchema,
 )
 from .schema_loader import SchemaLoader, SchemaValidator
-from .sql_parser import SQLParser, SQLComparator
-from .evaluator import Evaluator
+from .sql_parser import SQLComparator, SQLParser
 
 __all__ = [
     "QueryStatus",
-    "Difficulty", 
+    "Difficulty",
     "Category",
     "TableSchema",
     "DatabaseSchema",

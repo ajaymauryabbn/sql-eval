@@ -8,11 +8,11 @@ __version__ = "0.1.0"
 __author__ = "Ajay Maurya"
 
 from sql_eval.core.evaluator import Evaluator
-from sql_eval.core.models import EvaluationCase, EvaluationResult, EvaluationReport
+from sql_eval.core.models import EvaluationCase, EvaluationReport, EvaluationResult
 
 __all__ = [
     "Evaluator",
-    "EvaluationCase", 
+    "EvaluationCase",
     "EvaluationResult",
     "EvaluationReport",
 ]

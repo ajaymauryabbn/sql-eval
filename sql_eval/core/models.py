@@ -3,8 +3,8 @@ Data models for sql-eval framework
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Any
 from enum import Enum
+from typing import Optional
 
 
 class QueryStatus(Enum):
@@ -52,7 +52,7 @@ class DatabaseSchema:
     """Complete database schema"""
     tables: dict[str, TableSchema]
     relationships: list[dict] = field(default_factory=list)
-    
+
     def to_prompt_string(self) -> str:
         """Convert schema to string format for LLM prompts"""
         lines = []
@@ -68,15 +68,15 @@ class DatabaseSchema:
                 if col_info.get('nullable') is False:
                     col_str += " NOT NULL"
                 lines.append(col_str)
-            
+
             if table.foreign_keys:
                 lines.append("  Foreign Keys:")
                 for fk in table.foreign_keys:
                     lines.append(f"    - {fk['column']} -> {fk['references']}")
             lines.append("")
-        
+
         return "\n".join(lines)
-    
+
     def to_ddl_string(self) -> str:
         """Convert schema to CREATE TABLE statements"""
         statements = []
@@ -91,13 +91,13 @@ class DatabaseSchema:
                 if col_info.get('default') is not None:
                     col_def += f" DEFAULT {col_info['default']}"
                 cols.append(col_def)
-            
+
             for fk in table.foreign_keys:
                 cols.append(f"  FOREIGN KEY ({fk['column']}) REFERENCES {fk['references']}")
-            
+
             stmt = f"CREATE TABLE {table_name} (\n" + ",\n".join(cols) + "\n);"
             statements.append(stmt)
-        
+
         return "\n\n".join(statements)
 
 
@@ -124,7 +124,7 @@ class PartialScores:
     orderby_match: bool = False
     aggregations_match: bool = False
     overall_score: float = 0.0
-    
+
     def to_dict(self) -> dict:
         return {
             "tables_match": self.tables_match,
@@ -146,22 +146,22 @@ class EvaluationResult:
     ground_truth_sql: str
     generated_sql: str
     status: QueryStatus
-    
+
     # Core metrics
     exact_match: bool = False
     execution_match: bool = False
     partial_scores: Optional[PartialScores] = None
-    
+
     # Execution details
     ground_truth_result: Optional[list] = None
     generated_result: Optional[list] = None
     error_message: Optional[str] = None
     latency_ms: float = 0.0
-    
+
     # Metadata from test case
     difficulty: str = "medium"
     category: str = "complex"
-    
+
     def to_dict(self) -> dict:
         return {
             "question_id": self.question_id,
@@ -198,23 +198,23 @@ class EvaluationReport:
     execution_accuracy: float
     structural_accuracy: float
     avg_latency_ms: float
-    
+
     # Breakdown
     accuracy_by_category: dict[str, dict]
     accuracy_by_difficulty: dict[str, dict]
-    
+
     # Error analysis
     common_failure_patterns: list[FailurePattern]
-    
+
     # Individual results
     results: list[EvaluationResult]
-    
+
     # Metadata
     llm_provider: str = ""
     llm_model: str = ""
     dataset_name: str = ""
     timestamp: str = ""
-    
+
     def get_summary(self) -> str:
         """Get a text summary of the report"""
         lines = [
@@ -229,24 +229,24 @@ class EvaluationReport:
             "",
             "BY DIFFICULTY:",
         ]
-        
+
         for diff, stats in self.accuracy_by_difficulty.items():
             lines.append(f"  {diff}: {stats['accuracy']:.1%} ({stats['correct']}/{stats['total']})")
-        
+
         lines.append("")
         lines.append("BY CATEGORY:")
         for cat, stats in self.accuracy_by_category.items():
             lines.append(f"  {cat}: {stats['accuracy']:.1%} ({stats['correct']}/{stats['total']})")
-        
+
         if self.common_failure_patterns:
             lines.append("")
             lines.append("COMMON FAILURE PATTERNS:")
             for i, pattern in enumerate(self.common_failure_patterns[:5], 1):
                 lines.append(f"  {i}. {pattern.pattern_name} ({pattern.count} cases)")
-        
+
         lines.append("=" * 50)
         return "\n".join(lines)
-    
+
     def to_dict(self) -> dict:
         return {
             "summary": {

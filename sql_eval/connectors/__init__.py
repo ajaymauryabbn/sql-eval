@@ -3,9 +3,9 @@ Database connectors for sql-eval
 """
 
 from .base import BaseConnector
-from .sqlite import SQLiteConnector
-from .postgresql import PostgreSQLConnector
 from .mysql import MySQLConnector
+from .postgresql import PostgreSQLConnector
+from .sqlite import SQLiteConnector
 
 
 def get_connector(
@@ -15,12 +15,12 @@ def get_connector(
 ) -> BaseConnector:
     """
     Factory function to get database connector by type
-    
+
     Args:
         db_type: One of 'sqlite', 'postgresql', 'mysql'
         connection_string: Database connection string
         **kwargs: Additional connector-specific arguments
-        
+
     Returns:
         Configured database connector instance
     """
@@ -31,18 +31,18 @@ def get_connector(
         'pg': PostgreSQLConnector,
         'mysql': MySQLConnector,
     }
-    
+
     db_type = db_type.lower()
-    
+
     if db_type not in connectors:
         available = ', '.join(set(connectors.keys()))
         raise ValueError(
             f"Unknown database type: {db_type}. "
             f"Available types: {available}"
         )
-    
+
     connector_class = connectors[db_type]
-    
+
     if connection_string:
         return connector_class(connection_string=connection_string, **kwargs)
     return connector_class(**kwargs)

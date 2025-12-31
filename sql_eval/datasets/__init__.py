@@ -6,11 +6,10 @@ import json
 from pathlib import Path
 from typing import Tuple
 
+from ..connectors.sqlite import SQLiteConnector
+from ..core.evaluator import DatasetLoader
 from ..core.models import DatabaseSchema, EvaluationCase
 from ..core.schema_loader import SchemaLoader
-from ..core.evaluator import DatasetLoader
-from ..connectors.sqlite import SQLiteConnector
-
 
 DATASETS_DIR = Path(__file__).parent
 
@@ -30,27 +29,27 @@ def load_dataset(
 ) -> Tuple[list[EvaluationCase], DatabaseSchema, SQLiteConnector]:
     """
     Load a bundled dataset
-    
+
     Args:
         name: Dataset name (e.g., 'ecommerce')
         with_db: Whether to create SQLite database with seed data
-        
+
     Returns:
         Tuple of (test_cases, schema, db_connector or None)
     """
     dataset_path = DATASETS_DIR / name
-    
+
     if not dataset_path.exists():
         available = list_datasets()
         raise ValueError(
             f"Dataset '{name}' not found. "
             f"Available datasets: {available}"
         )
-    
+
     # Load schema
     schema_file = dataset_path / 'schema.sql'
     schema = SchemaLoader.from_sql_file(schema_file)
-    
+
     # Load test cases
     questions_file = dataset_path / 'questions.json'
     if questions_file.exists():
@@ -61,7 +60,7 @@ def load_dataset(
             test_cases = DatasetLoader.from_csv(questions_csv)
         else:
             raise ValueError(f"No questions file found in {dataset_path}")
-    
+
     # Optionally create database
     db_connector = None
     if with_db:
@@ -70,24 +69,24 @@ def load_dataset(
             schema_file=str(schema_file),
             seed_file=str(seed_file) if seed_file.exists() else None
         )
-    
+
     return test_cases, schema, db_connector
 
 
 def get_dataset_info(name: str) -> dict:
     """Get information about a dataset"""
     dataset_path = DATASETS_DIR / name
-    
+
     if not dataset_path.exists():
         raise ValueError(f"Dataset '{name}' not found")
-    
+
     # Count questions
     questions_file = dataset_path / 'questions.json'
     if questions_file.exists():
         with open(questions_file, 'r') as f:
             questions = json.load(f)
         num_questions = len(questions)
-        
+
         # Count by difficulty
         difficulty_counts = {}
         category_counts = {}
@@ -100,12 +99,12 @@ def get_dataset_info(name: str) -> dict:
         num_questions = 0
         difficulty_counts = {}
         category_counts = {}
-    
+
     # Count tables in schema
     schema_file = dataset_path / 'schema.sql'
     schema = SchemaLoader.from_sql_file(schema_file)
     num_tables = len(schema.tables)
-    
+
     return {
         'name': name,
         'path': str(dataset_path),
