@@ -2,10 +2,10 @@
 LLM Providers for sql-eval
 """
 
-from .base import BaseLLMProvider
-from .openai_provider import OpenAIProvider, AzureOpenAIProvider
 from .anthropic_provider import AnthropicProvider
+from .base import BaseLLMProvider
 from .ollama_provider import OllamaProvider, SQLCoderProvider
+from .openai_provider import AzureOpenAIProvider, OpenAIProvider
 
 
 def get_provider(
@@ -15,12 +15,12 @@ def get_provider(
 ) -> BaseLLMProvider:
     """
     Factory function to get LLM provider by name
-    
+
     Args:
         provider_name: One of 'openai', 'anthropic', 'ollama', 'sqlcoder', 'azure'
         model: Optional model name override
         **kwargs: Additional provider-specific arguments
-        
+
     Returns:
         Configured LLM provider instance
     """
@@ -33,18 +33,18 @@ def get_provider(
         'azure': AzureOpenAIProvider,
         'azure_openai': AzureOpenAIProvider,
     }
-    
+
     provider_name = provider_name.lower()
-    
+
     if provider_name not in providers:
         available = ', '.join(providers.keys())
         raise ValueError(
             f"Unknown provider: {provider_name}. "
             f"Available providers: {available}"
         )
-    
+
     provider_class = providers[provider_name]
-    
+
     if model:
         return provider_class(model=model, **kwargs)
     return provider_class(**kwargs)

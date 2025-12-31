@@ -4,15 +4,16 @@ OpenAI LLM Provider
 
 import os
 from typing import Optional
-from .base import BaseLLMProvider
+
 from ..core.models import DatabaseSchema
+from .base import BaseLLMProvider
 
 
 class OpenAIProvider(BaseLLMProvider):
     """OpenAI API provider (GPT-4, GPT-3.5, etc.)"""
-    
+
     DEFAULT_MODEL = "gpt-4o-mini"
-    
+
     def __init__(
         self,
         model: str = None,
@@ -26,11 +27,11 @@ class OpenAIProvider(BaseLLMProvider):
         self.temperature = temperature
         self.max_tokens = max_tokens
         self._client = None
-    
+
     @property
     def provider_name(self) -> str:
         return "openai"
-    
+
     @property
     def client(self):
         """Lazy initialization of OpenAI client"""
@@ -44,7 +45,7 @@ class OpenAIProvider(BaseLLMProvider):
                     "Install with: pip install openai"
                 )
         return self._client
-    
+
     def generate_sql(
         self,
         question: str,
@@ -52,9 +53,9 @@ class OpenAIProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Generate SQL using OpenAI API"""
-        
+
         prompt = self.build_prompt(question, schema, examples)
-        
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -71,17 +72,17 @@ class OpenAIProvider(BaseLLMProvider):
                 temperature=self.temperature,
                 max_tokens=self.max_tokens
             )
-            
+
             sql = response.choices[0].message.content
             return self.clean_sql(sql)
-            
+
         except Exception as e:
             raise RuntimeError(f"OpenAI API error: {str(e)}")
 
 
 class AzureOpenAIProvider(BaseLLMProvider):
     """Azure OpenAI API provider"""
-    
+
     def __init__(
         self,
         model: str,
@@ -99,11 +100,11 @@ class AzureOpenAIProvider(BaseLLMProvider):
         self.temperature = temperature
         self.max_tokens = max_tokens
         self._client = None
-    
+
     @property
     def provider_name(self) -> str:
         return "azure_openai"
-    
+
     @property
     def client(self):
         """Lazy initialization of Azure OpenAI client"""
@@ -121,7 +122,7 @@ class AzureOpenAIProvider(BaseLLMProvider):
                     "Install with: pip install openai"
                 )
         return self._client
-    
+
     def generate_sql(
         self,
         question: str,
@@ -129,9 +130,9 @@ class AzureOpenAIProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Generate SQL using Azure OpenAI API"""
-        
+
         prompt = self.build_prompt(question, schema, examples)
-        
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,  # This is the deployment name in Azure
@@ -148,9 +149,9 @@ class AzureOpenAIProvider(BaseLLMProvider):
                 temperature=self.temperature,
                 max_tokens=self.max_tokens
             )
-            
+
             sql = response.choices[0].message.content
             return self.clean_sql(sql)
-            
+
         except Exception as e:
             raise RuntimeError(f"Azure OpenAI API error: {str(e)}")

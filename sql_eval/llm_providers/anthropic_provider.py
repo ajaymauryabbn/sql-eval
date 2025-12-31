@@ -4,15 +4,16 @@ Anthropic LLM Provider (Claude)
 
 import os
 from typing import Optional
-from .base import BaseLLMProvider
+
 from ..core.models import DatabaseSchema
+from .base import BaseLLMProvider
 
 
 class AnthropicProvider(BaseLLMProvider):
     """Anthropic API provider (Claude models)"""
-    
+
     DEFAULT_MODEL = "claude-sonnet-4-20250514"
-    
+
     def __init__(
         self,
         model: str = None,
@@ -26,11 +27,11 @@ class AnthropicProvider(BaseLLMProvider):
         self.temperature = temperature
         self.max_tokens = max_tokens
         self._client = None
-    
+
     @property
     def provider_name(self) -> str:
         return "anthropic"
-    
+
     @property
     def client(self):
         """Lazy initialization of Anthropic client"""
@@ -44,7 +45,7 @@ class AnthropicProvider(BaseLLMProvider):
                     "Install with: pip install anthropic"
                 )
         return self._client
-    
+
     def generate_sql(
         self,
         question: str,
@@ -52,9 +53,9 @@ class AnthropicProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Generate SQL using Anthropic API"""
-        
+
         prompt = self.build_prompt(question, schema, examples)
-        
+
         try:
             response = self.client.messages.create(
                 model=self.model,
@@ -67,18 +68,18 @@ class AnthropicProvider(BaseLLMProvider):
                 ],
                 system="You are an expert SQL query generator. Return only the SQL query without any explanations or markdown formatting."
             )
-            
+
             # Extract text from response
             sql = ""
             for block in response.content:
                 if block.type == "text":
                     sql += block.text
-            
+
             return self.clean_sql(sql)
-            
+
         except Exception as e:
             raise RuntimeError(f"Anthropic API error: {str(e)}")
-    
+
     def build_prompt(
         self,
         question: str,
@@ -86,9 +87,9 @@ class AnthropicProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Build prompt optimized for Claude"""
-        
+
         schema_str = schema.to_ddl_string()
-        
+
         prompt = f"""Given the database schema below, generate a SQL query to answer the question.
 
 <database_schema>
@@ -103,14 +104,14 @@ class AnthropicProvider(BaseLLMProvider):
 - No trailing semicolon
 </rules>
 """
-        
+
         if examples:
             prompt += "\n<examples>\n"
             for i, ex in enumerate(examples, 1):
                 prompt += f"Question: {ex['question']}\n"
                 prompt += f"SQL: {ex['sql']}\n\n"
             prompt += "</examples>\n"
-        
+
         prompt += f"\n<question>\n{question}\n</question>\n\nSQL:"
-        
+
         return prompt

@@ -4,38 +4,38 @@ Ollama LLM Provider (100% Local)
 No data leaves your machine when using this provider.
 """
 
-import json
 from typing import Optional
-from .base import BaseLLMProvider
+
 from ..core.models import DatabaseSchema
+from .base import BaseLLMProvider
 
 
 class OllamaProvider(BaseLLMProvider):
     """
     Ollama provider for fully local LLM inference
-    
+
     Your data NEVER leaves your machine.
-    
+
     Supported models:
     - codellama (recommended for SQL)
     - llama3
     - mistral
     - sqlcoder (specialized for SQL)
     - deepseek-coder
-    
+
     Usage:
         # First, ensure Ollama is running:
         # $ ollama serve
-        
+
         # Pull a model:
         # $ ollama pull codellama
-        
+
         provider = OllamaProvider(model="codellama")
     """
-    
+
     DEFAULT_MODEL = "codellama"
     DEFAULT_BASE_URL = "http://localhost:11434"
-    
+
     def __init__(
         self,
         model: str = None,
@@ -48,11 +48,11 @@ class OllamaProvider(BaseLLMProvider):
         self.base_url = base_url or self.DEFAULT_BASE_URL
         self.temperature = temperature
         self.num_predict = num_predict
-    
+
     @property
     def provider_name(self) -> str:
         return "ollama"
-    
+
     def generate_sql(
         self,
         question: str,
@@ -60,7 +60,7 @@ class OllamaProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Generate SQL using local Ollama instance"""
-        
+
         try:
             import requests
         except ImportError:
@@ -68,9 +68,9 @@ class OllamaProvider(BaseLLMProvider):
                 "requests package not installed. "
                 "Install with: pip install requests"
             )
-        
+
         prompt = self.build_prompt(question, schema, examples)
-        
+
         try:
             response = requests.post(
                 f"{self.base_url}/api/generate",
@@ -85,17 +85,17 @@ class OllamaProvider(BaseLLMProvider):
                 },
                 timeout=120  # 2 minute timeout for slower machines
             )
-            
+
             if response.status_code != 200:
                 raise RuntimeError(
                     f"Ollama returned status {response.status_code}: {response.text}"
                 )
-            
+
             result = response.json()
             sql = result.get("response", "")
-            
+
             return self.clean_sql(sql)
-            
+
         except requests.exceptions.ConnectionError:
             raise RuntimeError(
                 "Cannot connect to Ollama. Make sure it's running:\n"
@@ -110,7 +110,7 @@ class OllamaProvider(BaseLLMProvider):
             )
         except Exception as e:
             raise RuntimeError(f"Ollama error: {str(e)}")
-    
+
     def build_prompt(
         self,
         question: str,
@@ -118,9 +118,9 @@ class OllamaProvider(BaseLLMProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Build prompt optimized for local models"""
-        
+
         schema_str = schema.to_ddl_string()
-        
+
         # Simpler, more direct prompt for smaller models
         prompt = f"""Generate a SQL query for the question below.
 
@@ -132,25 +132,25 @@ Rules:
 - No explanations
 - Standard SQL syntax
 """
-        
+
         if examples:
             prompt += "\nExamples:\n"
             for ex in examples[:3]:  # Limit examples for smaller context
                 prompt += f"Q: {ex['question']}\nSQL: {ex['sql']}\n\n"
-        
+
         prompt += f"Q: {question}\nSQL:"
-        
+
         return prompt
-    
+
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible"""
         try:
             import requests
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
-    
+
     def list_models(self) -> list[str]:
         """List available models in Ollama"""
         try:
@@ -159,7 +159,7 @@ Rules:
             if response.status_code == 200:
                 data = response.json()
                 return [m["name"] for m in data.get("models", [])]
-        except:
+        except Exception:
             pass
         return []
 
@@ -167,18 +167,18 @@ Rules:
 class SQLCoderProvider(OllamaProvider):
     """
     Specialized provider for SQLCoder model
-    
+
     SQLCoder is fine-tuned specifically for text-to-SQL tasks.
-    
+
     Usage:
         # Pull SQLCoder:
         # $ ollama pull sqlcoder
-        
+
         provider = SQLCoderProvider()
     """
-    
+
     DEFAULT_MODEL = "sqlcoder"
-    
+
     def build_prompt(
         self,
         question: str,
@@ -186,9 +186,9 @@ class SQLCoderProvider(OllamaProvider):
         examples: Optional[list[dict]] = None
     ) -> str:
         """Build prompt in SQLCoder's expected format"""
-        
+
         schema_str = schema.to_ddl_string()
-        
+
         # SQLCoder uses a specific prompt format
         prompt = f"""### Task
 Generate a SQL query to answer [QUESTION]{question}[/QUESTION]
@@ -201,15 +201,15 @@ The query will run on a database with the following schema:
 Given the database schema, here is the SQL query that answers [QUESTION]{question}[/QUESTION]
 [SQL]
 """
-        
+
         return prompt
-    
+
     def clean_sql(self, sql: str) -> str:
         """Clean SQLCoder's output format"""
         sql = super().clean_sql(sql)
-        
+
         # SQLCoder sometimes outputs [/SQL] tag
         if "[/SQL]" in sql:
             sql = sql.split("[/SQL]")[0]
-        
+
         return sql.strip()
