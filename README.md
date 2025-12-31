@@ -248,8 +248,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Author
 
-**Ajay Maurya** - AI Engineer  
-[LinkedIn](https://linkedin.com/in/ajaymaurya) | [GitHub](https://github.com/ajaymaurya)
+**Ajay Maurya** - AI Engineer
+[LinkedIn](https://linkedin.com/in/ajaymauryabbn) | [GitHub](https://github.com/ajaymauryabbn)
 
 ---
 
