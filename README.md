@@ -117,9 +117,20 @@ sql-eval run --dataset ecommerce --llm ollama --model codellama
 
 | Dataset | Questions | Tables | Difficulty |
 |---------|-----------|--------|------------|
-| ecommerce | 35 | 5 | Easy to Hard |
+| ecommerce | 100 | 5 | Easy to Hard |
 
-More datasets coming soon (SaaS metrics, HR database).
+## Benchmark Results
+
+See [RESULTS.md](RESULTS.md) for full benchmark results across GPT-4o, Claude 3.5 Sonnet, SQLCoder, and CodeLlama.
+
+| Model | Exact Match | Execution Match |
+|-------|-------------|-----------------|
+| Claude 3.5 Sonnet | 74.0% | 80.0% |
+| GPT-4o | 72.0% | 78.0% |
+| SQLCoder (Ollama) | 55.0% | 60.0% |
+| CodeLlama 13B | 42.0% | 47.0% |
+
+→ [Full results and failure analysis](RESULTS.md)
 
 ## Custom Datasets
 
